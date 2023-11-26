@@ -164,5 +164,6 @@ cython_debug/
 *.bin
 *.pickle
 chroma_db/*
+vectorstore/*
 bin
 obj

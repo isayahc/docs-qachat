@@ -7,6 +7,7 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 # access .env file
+import os
 from dotenv import load_dotenv
 #from bs4 import BeautifulSoup
 # HF libraries
@@ -24,9 +25,12 @@ from langchain.memory import ConversationBufferMemory
 #import logging
 import zipfile
 
-# load HF Token
+# load .env variables
 config = load_dotenv(".env")
-
+HUGGINGFACEHUB_API_TOKEN=os.getenv('HUGGINGFACEHUB_API_TOKEN')
+AWS_S3_LOCATION=os.getenv('AWS_S3_LOCATION')
+AWS_S3_FILE=os.getenv('AWS_S3_FILE')
+VS_DESTINATION=os.getenv('VS_DESTINATION')
 
 model_id = HuggingFaceHub(repo_id="HuggingFaceH4/zephyr-7b-beta", model_kwargs={
     "temperature":0.1, 
@@ -43,8 +47,8 @@ embeddings = HuggingFaceHubEmbeddings(repo_id=model_name)
 s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 ## Chroma DB
-s3.download_file('rad-rag-demos', 'vectorstores/chroma.sqlite3', './chroma_db/chroma.sqlite3')
-db = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
+s3.download_file(AWS_S3_LOCATION, AWS_S3_FILE, VS_DESTINATION)
+db = Chroma(persist_directory="./vectorstore", embedding_function=embeddings)
 db.get()
 
 ## FAISS DB
