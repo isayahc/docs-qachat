@@ -1,4 +1,3 @@
-# docu-qachat-demo
 ---
 title: Docs Qachat
 emoji: 🚀
