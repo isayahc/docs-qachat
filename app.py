@@ -25,6 +25,8 @@ from langchain.memory import ConversationBufferMemory
 #import logging
 import zipfile
 
+from custom_llm import init_chain
+
 # load .env variables
 config = load_dotenv(".env")
 HUGGINGFACEHUB_API_TOKEN=os.getenv('HUGGINGFACEHUB_API_TOKEN')
@@ -47,7 +49,7 @@ embeddings = HuggingFaceHubEmbeddings(repo_id=model_name)
 s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 ## Chroma DB
-s3.download_file(AWS_S3_LOCATION, AWS_S3_FILE, VS_DESTINATION)
+# s3.download_file(AWS_S3_LOCATION, AWS_S3_FILE, VS_DESTINATION)
 db = Chroma(persist_directory="./vectorstore", embedding_function=embeddings)
 db.get()
 
