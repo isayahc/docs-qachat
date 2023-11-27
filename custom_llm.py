@@ -1,4 +1,13 @@
-def init_chain(model, tokenizer):
+from threading import Thread
+from typing import Optional
+
+import gradio as gr
+from langchain import PromptTemplate, LLMChain
+from langchain.llms.base import LLM
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+
+
+def init_chain(model, tokenizer, prompt):
     class CustomLLM(LLM):
 
         """Streamer Object"""
@@ -19,8 +28,6 @@ def init_chain(model, tokenizer):
 
     llm = CustomLLM()
 
-    template = """Question: {question}
-    Answer: Let's think step by step."""
-    prompt = PromptTemplate(template=template, input_variables=["question"])
+
     llm_chain = LLMChain(prompt=prompt, llm=llm)
     return llm_chain, llm
