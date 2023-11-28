@@ -6,3 +6,4 @@ python-dotenv
 bs4
 gradio
 boto3
+transformers

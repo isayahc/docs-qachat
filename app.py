@@ -31,8 +31,8 @@ from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain.retrievers.document_compressors import EmbeddingsFilter
 from langchain.retrievers.multi_query import MultiQueryRetriever
 # streaming
-from threading import Thread
-from transformers import TextIteratorStreamer
+#from threading import Thread
+#from transformers import TextIteratorStreamer
 
 
 # load .env variables
