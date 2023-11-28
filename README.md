@@ -1,5 +1,5 @@
 ---
-title: Docs Qachat
+title: LC Gradio DocsAI
 emoji: 🚀
 colorFrom: gray
 colorTo: gray
@@ -9,13 +9,13 @@ app_file: app.py
 pinned: false
 ---
 
-# Docs QAchat 🚀
+# LC Gradio DocsAI 🚀
 
 ## Overview
-Docs QAchat is an advanced Documentation AI helper, demonstrating a fine-tuned 7b model's capabilities in aiding users with software documentation. This application integrates technologies like Retrieval-Augmented Generation (RAG), LangChain, Gradio UI, Chroma DB, and FAISS to offer insightful documentation assistance. It's designed to help users navigate and utilize software tools efficiently by retrieving relevant documentation pages and maintaining conversational flow.
+LC-Gradio-DocAI is a demo project showcasing a privately hosted advanced Documentation AI helper, demonstrating a fine-tuned 7B model's capabilities in aiding users with software documentation. This application integrates technologies like Retrieval-Augmented Generation (RAG) using LangChain, a vector store using Chroma DB or and FAISS and Gradio for a model UI to offer insightful documentation assistance. It's designed to help users navigate and utilize software tools efficiently by retrieving relevant documentation pages and maintaining conversational flow.
 
 ## Key Features
-- **AI-Powered Documentation Retrieval:** Utilizes various fine-tuned 7b models for precise and context-aware responses.
+- **AI-Powered Documentation Retrieval:** Utilizes various fine-tuned 7B models for precise and context-aware responses.
 - **Rich User Interface:** Features a user-friendly interface built with Gradio.
 - **Advanced Language Understanding:** Employs LangChain for implementing RAG setups and sophisticated natural language processing.
 - **Efficient Data Handling:** Leverages Chroma DB and FAISS for optimized data storage and retrieval.
@@ -34,7 +34,7 @@ This setup is tested with the following models:
 
 ## Prerequisites
 - Python 3.8 or later
-- [Additional prerequisites as needed]
+- [Additional prerequisites...]
 
 ## Installation
 1. Clone the repository:
@@ -68,14 +68,20 @@ python app.py
 [Include additional usage instructions and examples]
 
 ## Contributing
-Contributions to Docs QAchat are welcome. [Include contribution guidelines]
+Contributions to LC-Gradio-DocsAI are welcome. Here's how you can contribute:
+
+1. Fork the repository.
+2. Create a new branch (git checkout -b feature/YourFeature).
+3. Make changes and commit (git commit -m 'Add some feature').
+4. Push to the branch (git push origin feature/YourFeature).
+5. Create a new Pull Request.
 
 ## Support
-For support, contact [Support Contact Information].
+For support, please open an issue here on Github.
 
 ## Authors and Acknowledgement
 - [Name]
-- Acknowledgements to the contributors of the used models and technologies.
+- Thanks to contributors of all the awesome open-source LLMs, LangChain, HuggingFace, Chroma Vector Store, FAISS and Graido UI.
 
 ## License
 This project is licensed under the [License] - see the LICENSE file for details.

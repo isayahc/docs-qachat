@@ -1,7 +1,7 @@
 # gradio
 import gradio as gr
-import random
-import time
+#import random
+#import time
 #boto3 for S3 access
 import boto3
 from botocore import UNSIGNED
@@ -18,12 +18,22 @@ from langchain.vectorstores import Chroma
 from langchain.vectorstores import FAISS
 # retrieval chain
 from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQAWithSourcesChain
 # prompt template
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 # logging
-#import logging
+import logging
 import zipfile
+#contextual retriever
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
+from langchain.retrievers.document_compressors import EmbeddingsFilter
+from langchain.retrievers.multi_query import MultiQueryRetriever
+# streaming
+from threading import Thread
+from transformers import TextIteratorStreamer
+
 
 # load .env variables
 config = load_dotenv(".env")
@@ -32,6 +42,7 @@ AWS_S3_LOCATION=os.getenv('AWS_S3_LOCATION')
 AWS_S3_FILE=os.getenv('AWS_S3_FILE')
 VS_DESTINATION=os.getenv('VS_DESTINATION')
 
+# initialize Model config
 model_id = HuggingFaceHub(repo_id="HuggingFaceH4/zephyr-7b-beta", model_kwargs={
     "temperature":0.1, 
     "max_new_tokens":1024, 
@@ -43,7 +54,7 @@ model_id = HuggingFaceHub(repo_id="HuggingFaceH4/zephyr-7b-beta", model_kwargs={
 model_name = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
 embeddings = HuggingFaceHubEmbeddings(repo_id=model_name)
 
-
+# retrieve vectorsrore
 s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 ## Chroma DB
@@ -60,6 +71,12 @@ db.get()
 # db = FAISS.load_local(FAISS_INDEX_PATH, embeddings)
 
 retriever = db.as_retriever(search_type = "mmr")#, search_kwargs={'k': 5, 'fetch_k': 25})
+
+compressor = LLMChainExtractor.from_llm(model_id)
+compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=retriever)
+# embeddings_filter = EmbeddingsFilter(embeddings=embeddings, similarity_threshold=0.76)
+# compression_retriever = ContextualCompressionRetriever(base_compressor=embeddings_filter, base_retriever=retriever)
+
 global qa 
 template = """
 You are the friendly documentation buddy Arti, who helps the Human in using RAY, the open-source unified framework for scaling AI and Python applications.\
@@ -81,13 +98,28 @@ prompt = PromptTemplate(
     template=template,
 )
 memory = ConversationBufferMemory(memory_key="history", input_key="question")
-qa = RetrievalQA.from_chain_type(llm=model_id, chain_type="stuff", retriever=retriever, verbose=True, return_source_documents=True, chain_type_kwargs={
+
+# logging for the chain
+logging.basicConfig()
+logging.getLogger("langchain.chains").setLevel(logging.INFO)    
+
+
+# qa = RetrievalQA.from_chain_type(llm=model_id, chain_type="stuff", retriever=compression_retriever, verbose=True, return_source_documents=True, chain_type_kwargs={
+#     "verbose": True,
+#     "memory": memory,
+#     "prompt": prompt
+# }
+#     )
+qa = RetrievalQAWithSourcesChain.from_chain_type(llm=model_id, retriever=compression_retriever, verbose=True, chain_type_kwargs={
     "verbose": True,
     "memory": memory,
-    "prompt": prompt
+    "prompt": prompt,
+    "document_variable_name": "context"
 }
     )
 
+def pretty_print_docs(docs):
+    print(f"\n{'-' * 100}\n".join([f"Document {i+1}:\n\n" + d.page_content for i, d in enumerate(docs)]))
 
 def add_text(history, text):
     history = history + [(text, None)]
@@ -95,18 +127,20 @@ def add_text(history, text):
 
 def bot(history):
     response = infer(history[-1][0], history)
+    print(*response)
     print(*memory)
-    sources = [doc.metadata.get("source") for doc in response['source_documents']]
+    sources = [doc.metadata.get("source") for doc in response['sources']]
     src_list = '\n'.join(sources)
-    print_this = response['result']+"\n\n\n Sources: \n\n\n"+src_list
+    print_this = response['answer'] + "\n\n\n Sources: \n\n\n" + src_list
+    #sources = f"`Sources:`\n\n' + response['sources']"
 
     #history[-1][1] = ""
     #for character in response['result']: #print_this:
     #    history[-1][1] += character
     #    time.sleep(0.05)
     #    yield history
-    history[-1][1] = print_this #response['result']
-    return history
+    history[-1][1] = response['answer']
+    return history #, sources
 
 def infer(question, history):
     query =  question
@@ -137,5 +171,4 @@ with gr.Blocks(css=css) as demo:
     )
     clear.click(lambda: None, None, chatbot, queue=False)
 
-demo.queue()
-demo.launch()
+demo.queue().launch()
