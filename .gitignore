@@ -166,3 +166,4 @@ cython_debug/
 chroma_db/*
 bin
 obj
+.langchain.sqlite
