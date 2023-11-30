@@ -94,8 +94,8 @@ db.get()
 # db = FAISS.load_local(FAISS_INDEX_PATH, embeddings)
 
 # initialize the bm25 retriever and chroma/faiss retriever
-bm25_retriever = BM25Retriever.
-bm25_retriever.k = 2
+# bm25_retriever = BM25Retriever.
+# bm25_retriever.k = 2
 
 retriever = db.as_retriever(search_type="mmr")#, search_kwargs={'k': 3, 'lambda_mult': 0.25})
 
