@@ -54,7 +54,10 @@ AWS_S3_FILE=os.getenv('AWS_S3_FILE')
 VS_DESTINATION=os.getenv('VS_DESTINATION')
 
 # initialize Model config
-model_id = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kwargs={
+llm_model_name = "mistralai/Mistral-7B-Instruct-v0.1"
+
+# changed named to model_id to llm as is common
+llm = HuggingFaceHub(repo_id=llm_model_name, model_kwargs={
     # "temperature":0.1, 
     "max_new_tokens":1024, 
     "repetition_penalty":1.2, 
@@ -100,10 +103,10 @@ db.get()
 retriever = db.as_retriever(search_type="mmr")#, search_kwargs={'k': 3, 'lambda_mult': 0.25})
 
 # asks LLM to create 3 alternatives baed on user query
-# multi_retriever = MultiQueryRetriever.from_llm(retriever=retriever, llm=model_id)
+# multi_retriever = MultiQueryRetriever.from_llm(retriever=retriever, llm=llm)
 
 # asks LLM to extract relevant parts from retrieved documents
-# compressor = LLMChainExtractor.from_llm(model_id)
+# compressor = LLMChainExtractor.from_llm(llm)
 # compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=multi_retriever)
 
 global qa 
@@ -135,13 +138,13 @@ logging.getLogger("langchain.chains.qa_with_sources").setLevel(logging.INFO)
 
 
 
-# qa = RetrievalQA.from_chain_type(llm=model_id, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
+# qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
 #     "verbose": True,
 #     "memory": memory,
 #     "prompt": prompt
 # }
 #     )
-qa = RetrievalQAWithSourcesChain.from_chain_type(llm=model_id, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
+qa = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
     "verbose": True,
     "memory": memory,
     "prompt": prompt,
