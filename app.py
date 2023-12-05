@@ -45,6 +45,12 @@ from prompt import template
 
 set_verbose(True)
 
+
+# set up logging for the chain
+logging.basicConfig()
+logging.getLogger("langchain.retrievers").setLevel(logging.INFO)    
+logging.getLogger("langchain.chains.qa_with_sources").setLevel(logging.INFO)    
+
 # load .env variables
 config = load_dotenv(".env")
 HUGGINGFACEHUB_API_TOKEN=os.getenv('HUGGINGFACEHUB_API_TOKEN')
@@ -103,12 +109,6 @@ prompt = PromptTemplate(
     template=template,
 )
 memory = ConversationBufferMemory(memory_key="history", input_key="question")
-
-# logging for the chain
-logging.basicConfig()
-logging.getLogger("langchain.retrievers").setLevel(logging.INFO)    
-logging.getLogger("langchain.chains.qa_with_sources").setLevel(logging.INFO)    
-
 
 
 
