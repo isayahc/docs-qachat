@@ -175,3 +175,6 @@ with gr.Blocks(css=css) as demo:
     #clear.click(lambda: None, None, chatbot, queue=False)
 
 demo.queue().launch()
+
+def create_gradio_interface(qa:RetrievalQAWithSourcesChain, ):
+    pass
