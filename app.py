@@ -14,6 +14,9 @@ from qa import qa
 ####
 
 def create_gradio_interface(qa:RetrievalQAWithSourcesChain):
+    """
+    Create a gradio interface for the QA model
+    """
     def add_text(history, text):
         history = history + [(text, None)]
         return history, ""
@@ -63,6 +66,7 @@ def create_gradio_interface(qa:RetrievalQAWithSourcesChain):
             bot, chatbot, chatbot
         )
         #clear.click(lambda: None, None, chatbot, queue=False)
+    return demo
 
 if __name__ == "__main__":
     demo = create_gradio_interface(qa)
