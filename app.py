@@ -38,6 +38,9 @@ from langchain.cache import SQLiteCache
 # gradio
 import gradio as gr
 
+# template for prompt
+from prompt import template
+
 
 
 set_verbose(True)
@@ -94,21 +97,7 @@ retriever = db.as_retriever(search_type="mmr")#, search_kwargs={'k': 3, 'lambda_
 
 
 global qa 
-template = """
-You are the friendly documentation buddy Arti, who helps the Human in using RAY, the open-source unified framework for scaling AI and Python applications.\
-    Use the following context (delimited by <ctx></ctx>) and the chat history (delimited by <hs></hs>) to answer the question :
-------
-<ctx>
-{context}
-</ctx>
-------
-<hs>
-{history}
-</hs>
-------
-{question}
-Answer:
-"""
+
 prompt = PromptTemplate(
     input_variables=["history", "context", "question"],
     template=template,
