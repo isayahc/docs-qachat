@@ -58,6 +58,14 @@ AWS_S3_LOCATION=os.getenv('AWS_S3_LOCATION')
 AWS_S3_FILE=os.getenv('AWS_S3_FILE')
 VS_DESTINATION=os.getenv('VS_DESTINATION')
 
+# remove old vectorstore
+if os.path.exists(VS_DESTINATION):
+    os.remove(VS_DESTINATION)
+
+# remove old sqlite cache
+if os.path.exists('.langchain.sqlite'):
+    os.remove('.langchain.sqlite')
+
 # initialize Model config
 llm_model_name = "mistralai/Mistral-7B-Instruct-v0.1"
 
@@ -74,14 +82,6 @@ llm = HuggingFaceHub(repo_id=llm_model_name, model_kwargs={
 embedding_model_name = "sentence-transformers/all-mpnet-base-v2"
 embeddings = HuggingFaceHubEmbeddings(repo_id=embedding_model_name)
 
-# remove old vectorstore
-if os.path.exists(VS_DESTINATION):
-    os.remove(VS_DESTINATION)
-
-# remove old sqlite cache
-if os.path.exists('.langchain.sqlite'):
-    os.remove('.langchain.sqlite')
-
 set_llm_cache(SQLiteCache(database_path=".langchain.sqlite"))
 
 # retrieve vectorsrore
@@ -97,8 +97,6 @@ db.get()
 retriever = db.as_retriever(search_type="mmr")#, search_kwargs={'k': 3, 'lambda_mult': 0.25})
 
 # asks LLM to create 3 alternatives baed on user query
-
-
 # asks LLM to extract relevant parts from retrieved documents
 
 
