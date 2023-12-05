@@ -1,48 +1,44 @@
-# gradio
-import gradio as gr
-#import random
+
+# logging
+import logging
+
+# access .env file
+import os
+from dotenv import load_dotenv
+
 import time
+
 #boto3 for S3 access
 import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
-# access .env file
-import os
-from dotenv import load_dotenv
-#from bs4 import BeautifulSoup
+
 # HF libraries
 from langchain.llms import HuggingFaceHub
 from langchain.embeddings import HuggingFaceHubEmbeddings
 # vectorestore
 from langchain.vectorstores import Chroma
-#from langchain.vectorstores import FAISS
+
 # retrieval chain
-#from langchain.chains import RetrievalQA
 from langchain.chains import RetrievalQAWithSourcesChain
 # prompt template
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
-# logging
-import logging
-#import zipfile
-# improve results with retriever
-# from langchain.retrievers import ContextualCompressionRetriever
-# from langchain.retrievers.document_compressors import LLMChainExtractor
-# from langchain.retrievers.document_compressors import EmbeddingsFilter
-# from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
 # reorder retrived documents
-#from langchain.document_transformers import LongContextReorder
 # github issues
 from langchain.document_loaders import GitHubIssuesLoader
 # debugging
 from langchain.globals import set_verbose
 # caching
 from langchain.globals import set_llm_cache
-#from langchain.cache import InMemoryCache
 # We can do the same thing with a SQLite cache
 from langchain.cache import SQLiteCache
-#set_llm_cache(InMemoryCache())
+
+# gradio
+import gradio as gr
+
+
 
 set_verbose(True)
 
@@ -65,7 +61,7 @@ llm = HuggingFaceHub(repo_id=llm_model_name, model_kwargs={
 #    "return_full_text":True
     })
 
-#embedding_model_name = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
+# initialize Embedding config
 embedding_model_name = "sentence-transformers/all-mpnet-base-v2"
 embeddings = HuggingFaceHubEmbeddings(repo_id=embedding_model_name)
 
@@ -88,26 +84,14 @@ s3.download_file(AWS_S3_LOCATION, AWS_S3_FILE, VS_DESTINATION)
 db = Chroma(persist_directory="./vectorstore", embedding_function=embeddings)
 db.get()
 
-## FAISS DB
-# s3.download_file('rad-rag-demos', 'vectorstores/faiss_db_ray.zip', './chroma_db/faiss_db_ray.zip')
-# with zipfile.ZipFile('./chroma_db/faiss_db_ray.zip', 'r') as zip_ref:
-#     zip_ref.extractall('./chroma_db/')
-
-# FAISS_INDEX_PATH='./chroma_db/faiss_db_ray'
-# db = FAISS.load_local(FAISS_INDEX_PATH, embeddings)
-
-# initialize the bm25 retriever and chroma/faiss retriever
-# bm25_retriever = BM25Retriever.
-# bm25_retriever.k = 2
 
 retriever = db.as_retriever(search_type="mmr")#, search_kwargs={'k': 3, 'lambda_mult': 0.25})
 
 # asks LLM to create 3 alternatives baed on user query
-# multi_retriever = MultiQueryRetriever.from_llm(retriever=retriever, llm=llm)
+
 
 # asks LLM to extract relevant parts from retrieved documents
-# compressor = LLMChainExtractor.from_llm(llm)
-# compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=multi_retriever)
+
 
 global qa 
 template = """
@@ -138,12 +122,7 @@ logging.getLogger("langchain.chains.qa_with_sources").setLevel(logging.INFO)
 
 
 
-# qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
-#     "verbose": True,
-#     "memory": memory,
-#     "prompt": prompt
-# }
-#     )
+
 qa = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True, verbose=True, chain_type_kwargs={
     "verbose": True,
     "memory": memory,
@@ -168,12 +147,7 @@ def bot(history):
     src_list = '\n'.join(sources)
     print_this = response['answer'] + "\n\n\n Sources: \n\n\n" + src_list
 
-    # history[-1][1] = ""
-    # for character in response['answer']: 
-    #     #print_this:
-    #     history[-1][1] += character
-    #     time.sleep(0.01)
-    #     yield history
+
     history[-1][1] = print_this #response['answer']
     return history
 
