@@ -62,9 +62,9 @@ model_id = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.1", model_kw
 #    "return_full_text":True
     })
 
-#model_name = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-model_name = "sentence-transformers/all-mpnet-base-v2"
-embeddings = HuggingFaceHubEmbeddings(repo_id=model_name)
+#embedding_model_name = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
+embedding_model_name = "sentence-transformers/all-mpnet-base-v2"
+embeddings = HuggingFaceHubEmbeddings(repo_id=embedding_model_name)
 
 # remove old vectorstore
 if os.path.exists(VS_DESTINATION):
